@@ -1,0 +1,3 @@
+from bitcoin.core import Hash
+p = Hash("deepti").encode('utf-8')
+print(p)
