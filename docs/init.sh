@@ -39,4 +39,8 @@ sudo apt intsall -y python3-pip
 
 # intstalls the bitcoin library for python
 pip3 install bitcoin
-sudo apt-get -y install python3-bitcoinlib
+#sudo apt-get -y install python3-bitcoinlib
+
+#Per information on this StackOverflow page:
+# https://bitcoin.stackexchange.com/questions/74105/modulenotfounderror-no-module-named-bitcoin
+pip3 install python-bitcoinlib
