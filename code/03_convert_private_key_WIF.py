@@ -20,4 +20,6 @@ while not valid_private_key:
 print(valid_private_key)
 print("The new private key (Hex) is:",new_private_key_hex)
 
-
+#convert the private key to WIF(Wallet interchange format) format using the bitcoin libray function.
+new_private_key_hex_WIF = bitcoin.encode_privkey(new_private_key_hex,'wif')
+print("The private key in the WIF format = ",new_private_key_hex_WIF)
