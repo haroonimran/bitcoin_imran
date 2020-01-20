@@ -2,6 +2,7 @@
 
 import bitcoin
 import hashlib
+import base58
 
 
 #hashlib enables us to utilze the SHA256 function
@@ -38,11 +39,14 @@ new_private_key_hex01 = str(80)+new_private_key_hex
 print("Step1-WIF: New_private_key_hex01 with 80 prefixed: ", new_private_key_hex01)
 
 #Step 2: Perform 2 SHA256 hashes on the above private key
-new_private_key_bytes_SHA256 = sha256(sha256(new_private_key_hex01.encode()).digest()).digest()
-print("the double sha 256 of the pre-fixed Private Key is:",new_private_key_bytes_SHA256)
+SHA256_1 = sha256(new_private_key_hex01.encode()).digest()
+print("The first sha 256 of the pre-fixed Private Key is:",SHA256_1)
 
-new_private_key_HEX_SHA256 = new_private_key_bytes_SHA256.hex()
-print("the double sha 256 of the pre-fixed Private Key is:",new_private_key_HEX_SHA256)
+SHA256_2 = sha256(SHA256_1).digest()
+print("the double sha 256 of the pre-fixed Private Key is:",SHA256_2)
+
+new_private_key_HEX_SHA256 = SHA256_2.hex()
+print("the double sha 256 of the pre-fixed Private Key iin HEX is:",new_private_key_HEX_SHA256)
 
 #new_private_key_hex01_SHA256 = sha256(sha256(new_private_key_hex01.encode('utf-8')).digest()).digest()
 #print("the double sha 256 of the pre-fixed Private Key is:",new_private_key_hex01_SHA256)
@@ -55,4 +59,8 @@ print("First 4 bytes = ",first4)
 new_private_key_hex01_with_checksum = new_private_key_hex01 + first4
 print("New private key w checksum = ",new_private_key_hex01_with_checksum)
 
+new_private_key_hex01_with_checksum_decimal = int(new_private_key_hex01_with_checksum,16)
+
 #Step 5: Base58 Check Encode
+private_key_base58 = base58.b58encode_int(new_private_key_hex01_with_checksum_decimal)
+print("base58 key is:", private_key_base58)
