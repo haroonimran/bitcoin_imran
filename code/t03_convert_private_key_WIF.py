@@ -3,7 +3,7 @@
 import bitcoin
 import hashlib
 import base58
-
+from bitcoin.core import b2x
 
 #hashlib enables us to utilze the SHA256 function
 from hashlib import sha256
@@ -39,7 +39,7 @@ new_private_key_hex01 = str(80)+new_private_key_hex
 print("Step1-WIF: New_private_key_hex01 with 80 prefixed: ", new_private_key_hex01)
 
 #Step 2: Perform 2 SHA256 hashes on the above private key
-SHA256_1 = sha256(new_private_key_hex01.encode()).digest()
+SHA256_1 = sha256(new_private_key_hex01.encode('utf-8')).digest()
 print("The first sha 256 of the pre-fixed Private Key is:",SHA256_1)
 
 SHA256_2 = sha256(SHA256_1).digest()
