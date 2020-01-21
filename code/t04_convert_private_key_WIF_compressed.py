@@ -1,7 +1,6 @@
 #example 4-5
 
 import bitcoin
-from hashlib import sha256
 import base58
 import binascii
 
@@ -22,33 +21,33 @@ while not valid_private_key:
 print("   ******Generating WIF Using PyPi Library*****   \n")
 print("1. The new private key (Hex) is:","\n",new_private_key_hex)
 
-#convert the private key to WIF(Wallet interchange format) format using the bitcoin libray function.
-new_private_key_hex_WIF = bitcoin.encode_privkey(new_private_key_hex,'wif')
+#convert the private key to WIF(Wallet interchange format) format using the bitcoin libray function
+
+new_private_key_hex_WIF = bitcoin.encode_privkey(bitcoin.decode_privkey(new_private_key_hex,'hex'),'wif_compressed')
 print("\n")
-print("2. WIF Private Key using pypi 'bitcoin' library = ","\n",new_private_key_hex_WIF)
+print("2. WIF [COMPRESSED] Private Key using pypi 'bitcoin' library = ","\n",new_private_key_hex_WIF)
 
 #Converting the WIF Private key manually, the hard way:
 # https://en.bitcoin.it/wiki/Wallet_import_format
 
 #Step 1: Prefix version information
 #Prefix 0x80 for mainnet or 0xef for test net. The following step generates a Hex literal string with "80" prefixed to it:
-new_private_key_hex01 = '80'+new_private_key_hex
-
+new_private_key_hex01 = '80'+new_private_key_hex+'01'
 print("\n")
 print("   ******Generating WIF the hard way*****   \n")
 print("3. Generating WIF the hard way:")
-print("3.1 Step1-WIF: New_private_key_hex01 with 80 prefixed:","\n",new_private_key_hex01)
+print("3.1 Step1-WIF: New_private_key_hex01 with 80 prefixed 01 post-fixed:","\n",new_private_key_hex01)
+
 #Step 1.1:
-new_private_key_binary = binascii.unhexlify(new_private_key_hex01)
-print("3.2 New_private_key_binary =","\n",new_private_key_binary)
+# IMPORTANT!!! - Always convert the Hex value of the ECDSA private key 
+# into Raw Bytes before Hashing it using SHA256
+new_private_key_bytes = binascii.unhexlify(new_private_key_hex01)
+print("3.2 New_private_key_binary =","\n",new_private_key_bytes)
 
 print("\n")
 #Step 2: Perform 2 SHA256 hashes on the above private key
 #https://bitcoin.stackexchange.com/questions/43347/how-to-generate-bitcoin-address
-
-# IMPORTANT!!! - Always convert the Hex value of the ECDSA private key 
-# into Raw Bytes before Hashing it using SHA256
-SHA256_1_input = new_private_key_binary
+SHA256_1_input = new_private_key_bytes
 SHA256_1_output = sha256(SHA256_1_input).hexdigest()
 print("4. The first sha 256 of the pre-fixed Private Key is:","\n",SHA256_1_output)
 
