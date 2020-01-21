@@ -3,6 +3,7 @@
 import bitcoin
 import hashlib
 import base58
+import base58check
 from bitcoin.core import b2x
 
 #hashlib enables us to utilze the SHA256 function
@@ -64,3 +65,7 @@ new_private_key_hex01_with_checksum_decimal = int(new_private_key_hex01_with_che
 #Step 5: Base58 Check Encode
 private_key_base58 = base58.b58encode_int(new_private_key_hex01_with_checksum_decimal)
 print("base58 key is:", private_key_base58)
+
+private_key_base58_alternate_library = base58check.b58encode(new_private_key_hex01_with_checksum.encode('ascii'))
+print("base58 key alternate is:", private_key_base58_alternate_library)
+print(new_private_key_hex01_with_checksum.encode('ascii'))
