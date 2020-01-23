@@ -1,12 +1,14 @@
 #example 4-5
 
-import bitcoin
-import base58
-import binascii
-
-#hashlib enables us to utilze the SHA256 function
+import bitcoin             #Using library funtions to generate private keys the "easy" way.
+import base58              #to encode Private key to base58
+import binascii            #using binascii.unhexlify()
 from hashlib import sha256
+import ecdsa
+import os
 
+#A
+##################################  PRIVATE KEY   #########################################
 #generate a random private key
 valid_private_key = False
 while not valid_private_key:
@@ -60,9 +62,6 @@ print("\n")
 SHA256_2_input = SHA256_1_binary
 SHA256_2_output = sha256(SHA256_1_binary).hexdigest()
 print("6. The double sha 256 of the pre-fixed Private Key is:","\n",SHA256_2_output)
-
-#new_private_key_hex01_SHA256 = sha256(sha256(new_private_key_hex01.encode('utf-8')).digest()).digest()
-#print("the double sha 256 of the pre-fixed Private Key is:",new_private_key_hex01_SHA256)
 
 #Step 3: Get the first 4 bytes of the double sha Hex:
 first4 = SHA256_2_output[0:8]
