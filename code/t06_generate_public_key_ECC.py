@@ -5,11 +5,8 @@
 ##############################################################################################
 
 import ecc
+from ecc import Point
 
-a = ecc.FieldElement(12, 19)
-b = ecc.FieldElement(18, 19)
 
-c = a + b
-d = a * b
-print(c)
-print(d)
+point1 = Point(-1,-1,5,7)
+print(point1)
