@@ -71,6 +71,7 @@ print("First 4 bytes of double SHA256 = ","\n",first4)
 print("\n")
 #Step 4: Add checksum to priv key (suffix)
 new_private_key_hex01_with_checksum = new_private_key_hex01 + first4
+
 print("7. New private key w checksum = ","\n",new_private_key_hex01_with_checksum)
 
 new_private_key_hex01_with_checksum_decimal = int(new_private_key_hex01_with_checksum,16)

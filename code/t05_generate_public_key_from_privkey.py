@@ -1,4 +1,8 @@
 #example 4-5
+##############################################################################################
+# HAROON IMRAN
+# haroon.imran@gmail.com
+##############################################################################################
 
 import bitcoin             #Using library funtions to generate private keys the "easy" way.
 import base58              #to encode Private key to base58
@@ -7,12 +11,43 @@ from hashlib import sha256
 import ecdsa
 import os
 
-# A.
-################################# PUBLIC KEY #####################################
-#Step 7: Generate Public Key
-# As bitcoin used the elliptic curve secp256k12.4.1
-# The following is excerpted from the standards document at the website below.
-##################################################################################
+#STEP 1. #########  GENERATE PRIVATE KEY ############
+
+#Generate a new 32bit random key using the OS's CSPRNG:
+private_key_bytes = os.urandom(32)
+private_key_hex = private_key_bytes.hex()
+private_key_int = int(private_key_hex,16)
+print("Private key Bytes =", private_key_bytes)
+private_key_hex = private_key_bytes.hex()
+print("Private key Hex",private_key_hex)
+
+#compressed Private key
+private_key_temp = '80'+private_key_hex
+sha1 = sha256(binascii.unhexlify(private_key_temp)).hexdigest()
+sha2 = sha256(binascii.unhexlify(sha1)).hexdigest()
+first4 = sha2[0:8]
+print("first 4 =",first4)
+
+private_key_w_checksum_uncmp = private_key_temp+first4
+print("private_key_temp_checksum =",private_key_w_checksum_uncmp)
+
+private_key_uncmp_int = int(private_key_w_checksum_uncmp,16)
+
+#base58check
+private_uncompressed = base58.b58encode_int(private_key_uncmp_int)
+print("private key uncompressed:",private_uncompressed)
+
+
+#uncompressed Private key
+private_key_w_checksum_cmp = private_key_temp+'01'+first4
+private_key_cmp_int = int(private_key_w_checksum_cmp,16)
+private_compressed = base58.b58encode_int(private_key_cmp_int)
+print("private key compressed:",private_compressed)
+
+
+
+# STEP 2: #######    GENERATE PUBLIC KEY    ########
+# As bitcoin used the elliptic curve secp256k12.4.1 # The following is excerpted from the standards document at the website below.
 """
 Recommended Parameters secp256k1 http://www.oid-info.com/get/1.3.132.0.10
 The elliptic curve domain parameters over F p associated with a Koblitz curve secp256k1 are
@@ -48,10 +83,6 @@ curve_secp256k1 = ecdsa.ellipticcurve.CurveFp(_p,_a,_b)
 
 # Set generator point:
 generator_secp256k1 = ecdsa.ellipticcurve.Point(curve_secp256k1,_Gx,_Gy,_r)
-
-# Set oid
-oid_secp256k1 = (1,3,132,0,10)    
-
-# Instantiate curve?? (check on this)
-SECP256k1 = ecdsa.curves.Curve("secp256k1",curve_secp256k1,generator_secp256k1,oid_secp256k1)
-
+print("generator_secp256k1",generator_secp256k1)
+point = generator_secp256k1 * private_key_bytes
+print(point)
