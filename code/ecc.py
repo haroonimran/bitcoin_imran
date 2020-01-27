@@ -14,9 +14,6 @@
 # Example: F(7) = {0,1,2,3,4,5,6} / On this field, ordinary addition and multiplication are not "closed" e.g 4+5 = 9 or 3*4 = 12 
 # are not elements of F(7). The Closure of addition and multiplication is acheived through modulo arithmetic.
 #######################################################################################################################
-
-
-
 #------------------------------------
 # 1. Finite Field.
 #------------------------------------
@@ -72,13 +69,48 @@ class FieldElement:
 #------------------------------------
 class Point:
 
-    def __init__(self, int x, y, a, b):
+    def __init__(self, x, y, a, b):
         self.a = a
         self.b = b
         self.x = x
         self.y = y
+        #Allow the object to be a point at infinity (Additive Identity)
+        if self.x == None or self.y == None:
+            return
         if ((self.y ** 2) != (self.x ** 3) + (self.a * x) + self.b):
-            raise ValueError("The point ({},{}) does not lie on an elliptic curve".format(x,y))
+            raise ValueError("The point ({},{}) does not lie on the elliptic curve y**2 = x**3 + {}x + {}".format(x,y,a,b))
+
+    def __add__(self, other):
+        #Test that the points are on the same curve.
+        if self.a != other.a or self.b != other.b:
+            raise ValueError("The points are not on the same curve.")
+        
+        #Add1 - Define point addition to the additive identity (point at "infinity" on the elliptic curve)
+        # Adding the additive identity (None,None) to x1,y1
+        if self.x == None and self.y == None:
+            return self.__class__(other.x, other.y,other.a,other.b)
+        if other.x == None and other.y == None:
+            return self.__class__(self.x,self.y,self.a,self.b)
+        #Add2 - Define point addition with the additive inverse. The result is the additive identity.
+        # x1 = x2 & y1 = -y2
+        if self.x == other.x and self.y != other.y:
+            return self.__class__(None,None,self.a,self.b) 
+        #Add3 - x1 != x2 /  Refer to equation on page 36 of the book Programming Bitcoin, First Edition.
+        if self.x != other.x:
+            s = (other.y - self.y)/(other.x - self.x)
+            x_sum = s**2 - self.x - other.x1
+            y_sum = s*(self.x - x_sum) - self.y
+            return self.__class__(x_sum,y_sum,self.a, self.b)
+        #Add4 - when x1,y1 = x2,y2 (i.e., the line across the vurve is a tangent)
+        # Refer to equations f on pages 36-36 of the book Programming Bitcoin, First Edition.
+        if self == other:
+            s = (3*(self.x**2) + self.a)/2*self.y
+            x_sum = s**2 - self.x - other.x1
+            y_sum = s*(self.x - x_sum) - self.y
+            return self.__class__(x_sum,y_sum,self.a, self.b)
+        #Add5 - when x1,y1 = x2,y2 and y = 0, return the point at infinity.
+        if self == other and self.y == 0:
+            return self.__class__(None,None,self.a, self.b)
 
     def __eq__(self,other):
         if other == None:
@@ -97,4 +129,4 @@ class Point:
     def __repr__(self):
         if self == None:
             raise TypeError("Cant print an undefined object.")
-        return "The point is : (x={},y={},a={},b={})".format(self.x,self.y,self.a,self.b)
+        return "The point is : (x={},y={})_{},_{}".format(self.x,self.y,self.a,self.b)
