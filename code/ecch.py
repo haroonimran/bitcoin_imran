@@ -87,7 +87,7 @@ class Point:
         if self.field == True:
             if self.x.num == None or self.y.num == None:
                 return
-            if ((self.y.num ** 2) % self.x.prime != ((self.x.num ** 3) + (self.a.num * self.x.num) + self.b.num)) % self.x.prime:
+            if ((self.y.num ** 2) % self.x.prime != ((self.x.num ** 3) + (self.a.num * self.x.num) + self.b.num) % self.x.prime):
                 raise ValueError("Point({},{})_{}_{} Field({}) does not lie on the elliptic curve y**2 = x**3 + {}x + {}" \
                     .format(self.x.num,self.y.num,self.a.num,self.b.num,self.x.prime,self.a.num,self.b.num))
         else:

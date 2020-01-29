@@ -63,6 +63,7 @@ class FieldElement:
             return False
         return self.num == other.num and self.prime == other.prime
 
+
 #------------------------------------
 # 2. Point.
 #------------------------------------
@@ -79,14 +80,14 @@ class Point:
            isinstance(self.y, FieldElement) and \
            isinstance(self.a, FieldElement) and \
            isinstance(self.b, FieldElement):
-           self.field == True
+           self.field = True
 
         # Allow the object to be a point at infinity (Additive Identity)
         # Check whether the points lie on the curve.
         if self.field == True:
             if self.x.num == None or self.y.num == None:
                 return
-            if ((self.y.num ** 2) != (self.x.num ** 3) + (self.a.num * x) + self.b.num):
+            if ((self.y.num ** 2) % self.x.prime != ((self.x.num ** 3) + (self.a.num * self.x.num) + self.b.num) % self.x.prime):
                 raise ValueError("Point({},{})_{}_{} Field({}) does not lie on the elliptic curve y**2 = x**3 + {}x + {}" \
                     .format(self.x.num,self.y.num,self.a.num,self.b.num,self.x.prime,self.a.num,self.b.num))
         else:
@@ -176,7 +177,6 @@ class Point:
         else:
             if self.a == other.a and self.b == other.b and self.x == other.x and self.y == other.y:
                 return True
-    
 
     def __ne__(self,other):
         if other.x == None and other.y == None:
@@ -185,7 +185,6 @@ class Point:
         if self.field == True:
             if self.a.num != other.a.num or self.b.num != other.b.num or self.x.num != other.x.num or self.y.num != other.y.num:
                 return True
-           
         else:
             if self.a != other.a or self.b != other.b or self.x != other.x or self.y != other.y:
                 return True
@@ -194,6 +193,6 @@ class Point:
         if self == None:
             raise TypeError("Cant print an undefined object.")
         if self.field == True:
-            return "Point(x={},y={})_{},_{}".format(self.x.num,self.y.num,self.a.num,self.b.num)
+            return "Point({},{})_{},_{}".format(self.x.num,self.y.num,self.a.num,self.b.num)
         else:
-            return "Point(x={},y={})_{},_{}".format(self.x,self.y,self.a,self.b)
+            return "Point({},{})_{},_{}".format(self.x,self.y,self.a,self.b)
