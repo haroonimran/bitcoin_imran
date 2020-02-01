@@ -21,6 +21,8 @@ class FieldElement:
     
     # Constructor:
     def __init__(self,num,prime):
+        if num is None:
+            return
         if (num<0 and num>= prime):
             print("{} is not a valid element in a field of order {}".format(num,prime))
             raise ValueError("error")
@@ -48,11 +50,6 @@ class FieldElement:
         product = (self.num * other.num) % self.prime
         return self.__class__(product, self.prime)
 
-    # Overloading " ** "
-    def __pow__(self, exponent):
-        power = (self.num ** exponent) % self.prime
-        return self.__class__(power, self.prime)
-
     # Overloading the print() function for objects of class FieldElement.
     def __repr__(self):
         return 'FieldElement {}({})'.format(self.prime,self.num)
@@ -62,6 +59,33 @@ class FieldElement:
         if other == None:
             return False
         return self.num == other.num and self.prime == other.prime
+
+    def __pow__(self, exponent):
+        n = exponent % (self.prime - 1)
+        num = pow(self.num, n, self.prime)
+        return self.__class__(num, self.prime)
+
+    def __truediv__(self, other):
+        if self.prime != other.prime:
+            raise TypeError('Cannot divide two numbers in different Fields')
+        # self.num and other.num are the actual values
+        # self.prime is what we need to mod against
+        # use fermat's little theorem:
+        # self.num**(p-1) % p == 1
+        # this means:
+        # 1/n == pow(n, p-2, p)
+        num = (self.num * pow(other.num, self.prime - 2, self.prime)) % self.prime
+        # We return an element of the same class
+        return self.__class__(num, self.prime)
+
+    def __rmul__(self, coefficient):
+        num = (self.num * coefficient) % self.prime
+        return self.__class__(num=num, prime=self.prime)
+
+    def __ne__(self,other):
+        if self.num != other.num or self.prime != other.prime:
+            return True
+    
 
 
 #------------------------------------
@@ -85,7 +109,7 @@ class Point:
         # Allow the object to be a point at infinity (Additive Identity)
         # Check whether the points lie on the curve.
         if self.field == True:
-            if self.x.num == None or self.y.num == None:
+            if self.x == None or self.y == None:
                 return
             if ((self.y.num ** 2) % self.x.prime != ((self.x.num ** 3) + (self.a.num * self.x.num) + self.b.num) % self.x.prime):
                 raise ValueError("Point({},{})_{}_{} Field({}) does not lie on the elliptic curve y**2 = x**3 + {}x + {}" \
@@ -97,6 +121,7 @@ class Point:
                 raise ValueError("Point({},{})_{}_{} does not lie on the elliptic curve y**2 = x**3 + {}x + {}" \
                     .format(self.x,self.y,self.a,self.b,self.a,self.b))
 
+#####################################################################################################
 
     def __add__(self, other):
         #Test that the points are on the same curve.
@@ -107,18 +132,20 @@ class Point:
             if self.a != other.a or self.b != other.b:
                 raise ValueError("The points are not on the same curve.")
         
+        
         #Add1 - Define point addition to the additive identity (point at "infinity" on the elliptic curve)
         # Adding the additive identity (None,None) to x1,y1
         if self.field == True:
-            if self.x.num == None and self.y.num == None:
-                return self.__class__(other.x.num, other.y.num,other.a.num,other.b.num)
-            if other.x.num == None and other.y.num == None:
-                return self.__class__(self.x.num,self.y.num,self.a.num,self.b.num)
-        else:
             if self.x == None and self.y == None:
                 return self.__class__(other.x, other.y,other.a,other.b)
             if other.x == None and other.y == None:
                 return self.__class__(self.x,self.y,self.a,self.b)
+        else:
+            if self == None:
+                return self.__class__(other.x, other.y,other.a,other.b)
+            if other == None:
+                return self.__class__(self.x,self.y,self.a,self.b)
+
         
         #Add2 - Define point addition with the additive inverse. The result is the additive identity.
         # x1 = x2 & y1 = -y2
@@ -129,13 +156,15 @@ class Point:
             if self.x == other.x and self.y != other.y:
                 return self.__class__(None,None,self.a,self.b) 
         
+
         #Add3 - x1 != x2 /  Refer to equation on page 36 of the book Programming Bitcoin, First Edition.
         if self.field == True:
             if self.x.num != other.x.num:
-                s = (other.y.num - self.y.num)/(other.x.num - self.x.num)
-                x_sum = s**2 - self.x.num - other.x.num
-                y_sum = s*(self.x.num - x_sum) - self.y.num
-            return self.__class__(x_sum,y_sum,self.a.num, self.b.num)
+                s = (other.y - self.y)/(other.x - self.x)
+                x_sum = s**2 - self.x - other.x
+                y_sum = s*(self.x - x_sum) - self.y
+                return self.__class__(x_sum, y_sum, self.a, self.b)
+
         else:
             if self.x != other.x:
                 s = (other.y - self.y)/(other.x - self.x)
@@ -143,6 +172,7 @@ class Point:
                 y_sum = s*(self.x - x_sum) - self.y
                 return self.__class__(x_sum,y_sum,self.a, self.b)
         
+
         #Add4 - when x1,y1 = x2,y2 (i.e., the line across the vurve is a tangent)
         # Refer to equations f on pages 36-36 of the book Programming Bitcoin, First Edition.
         if self.field == True:
@@ -166,6 +196,7 @@ class Point:
             if self == other and self.y == 0:
                 return self.__class__(None,None,self.a, self.b)
 
+ #######################################################################################################   
     
     def __eq__(self,other):
         if other == None:
@@ -193,6 +224,6 @@ class Point:
         if self == None:
             raise TypeError("Cant print an undefined object.")
         if self.field == True:
-            return "Point({},{})_{},_{}".format(self.x.num,self.y.num,self.a.num,self.b.num)
+            return "Point({},{})_{}_{} Field Element({})".format(self.x.num,self.y.num,self.a.num,self.b.num,self.x.prime)
         else:
-            return "Point({},{})_{},_{}".format(self.x,self.y,self.a,self.b)
+            return "Point({},{})_{}_{}".format(self.x,self.y,self.a,self.b)
