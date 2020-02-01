@@ -48,5 +48,21 @@ y4 = FieldElement(119,223)
 a4 = FieldElement(0,223)
 b4 = FieldElement(7,223)
 
-p4 = Point(x2,y2,a2,b2)
-print("p4=",p4+p4)
+
+
+# Page 47 Exercise 2
+prime = 223
+a = FieldElement(0,prime = prime)
+b = FieldElement(7,prime = prime)
+
+x1 = FieldElement(None,prime = prime)
+y1 = FieldElement(None,prime = prime)
+
+x2 = FieldElement(76,prime = prime)
+y2 = FieldElement(66,prime = prime)
+
+p1 = Point(x1,y1,a,b)
+p2 = Point(x2,y2,a,b)
+total1 = p1 + p2
+print ("total1 - additive identity",total1)
+

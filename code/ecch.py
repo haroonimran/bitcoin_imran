@@ -21,7 +21,7 @@ class FieldElement:
     
     # Constructor:
     def __init__(self,num,prime):
-        if num is None:
+        if num == None:
             return
         if (num<0 and num>= prime):
             print("{} is not a valid element in a field of order {}".format(num,prime))
@@ -56,7 +56,7 @@ class FieldElement:
 
      # Overloading the "x == y" logical operation for objects of class FieldElement.
     def __eq__(self, other):
-        if other == None:
+        if other.x == None or other.y == None:
             return False
         return self.num == other.num and self.prime == other.prime
 
@@ -93,7 +93,7 @@ class FieldElement:
 #------------------------------------
 class Point:
 
-    def __init__(self, x, y, a, b, field = None):
+    def __init__(self, x, y, a, b, field = None,tangent = False):
         self.a = a
         self.b = b
         self.x = x
@@ -109,7 +109,7 @@ class Point:
         # Allow the object to be a point at infinity (Additive Identity)
         # Check whether the points lie on the curve.
         if self.field == True:
-            if self.x == None or self.y == None:
+            if self.x.num == None or self.y.num == None:
                 return
             if ((self.y.num ** 2) % self.x.prime != ((self.x.num ** 3) + (self.a.num * self.x.num) + self.b.num) % self.x.prime):
                 raise ValueError("Point({},{})_{}_{} Field({}) does not lie on the elliptic curve y**2 = x**3 + {}x + {}" \
@@ -136,14 +136,14 @@ class Point:
         #Add1 - Define point addition to the additive identity (point at "infinity" on the elliptic curve)
         # Adding the additive identity (None,None) to x1,y1
         if self.field == True:
+            if self.x.num == None and self.y.num == None:
+                return self.__class__(other.x, other.y,other.a,other.b)
+            if other.x.num == None and other.y.num == None:
+                return self.__class__(self.x,self.y,self.a,self.b)
+        else:
             if self.x == None and self.y == None:
                 return self.__class__(other.x, other.y,other.a,other.b)
             if other.x == None and other.y == None:
-                return self.__class__(self.x,self.y,self.a,self.b)
-        else:
-            if self == None:
-                return self.__class__(other.x, other.y,other.a,other.b)
-            if other == None:
                 return self.__class__(self.x,self.y,self.a,self.b)
 
         
@@ -173,7 +173,7 @@ class Point:
                 return self.__class__(x_sum,y_sum,self.a, self.b)
         
 
-        #Add4 - when x1,y1 = x2,y2 (i.e., the line across the vurve is a tangent)
+        #Add4 - when x1,y1 = x2,y2 (i.e., the line across the curve is a tangent)
         # Refer to equations f on pages 36-36 of the book Programming Bitcoin, First Edition.
         if self.field == True:
             if self == other:
@@ -227,3 +227,11 @@ class Point:
             return "Point({},{})_{}_{} Field Element({})".format(self.x.num,self.y.num,self.a.num,self.b.num,self.x.prime)
         else:
             return "Point({},{})_{}_{}".format(self.x,self.y,self.a,self.b)
+
+    def __rmul__(self,coefficient):
+        product = self
+        for _ in range(coefficient):
+            product = product + self
+        return product
+          
+        
