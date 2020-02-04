@@ -23,15 +23,13 @@ class FieldElement:
     def __init__(self,num,prime):
         self.num = num
         self.prime = prime
-        
         if self.num == None:
             return
-        
         if (self.num<0 and self.num>= prime):
             print("{} is not a valid element in a field of order {}".format(self.num,self.prime))
             raise ValueError("error")
   
-    # Overloading the "+" (plus) operator
+    # Similarly overloading "+" (plus)
     def __add__(self, other):
         if self.prime != other.prime:
             raise TypeError("Cant add objects not of the same Field.")
@@ -42,8 +40,8 @@ class FieldElement:
     def __sub__(self, other):
         if self.prime != other.prime:
             raise TypeError("Cant subtract from object not of the same Field.")
-        diff = (self.num - other.num) % self.prime
-        return self.__class__(diff, self.prime)
+        sum = (self.num - other.num) % self.prime
+        return self.__class__(sum, self.prime)
     
     # Overloading " * "
     def __mul__(self, other):
@@ -90,16 +88,17 @@ class FieldElement:
             return True
     
 
+
 #------------------------------------
 # 2. Point.
 #------------------------------------
 class Point:
 
-    def __init__(self, x, y, a, b, field = False):
-        self.x = x
-        self.y = y
+    def __init__(self, x, y, a, b, field = None):
         self.a = a
         self.b = b
+        self.x = x
+        self.y = y
         self.field = False
         
         if isinstance(self.x, FieldElement) and \
@@ -115,26 +114,27 @@ class Point:
                 return
             try:
                 if ((self.y.num ** 2) % self.x.prime != ((self.x.num ** 3) + (self.a.num * self.x.num) + self.b.num) % self.x.prime):
-                    raise ValueError("Point {} does not lie on the elliptic curve y**2 = x**3 + {}x + {}"\
-                        .format(self,self.a.num,self.b.num))
+                    raise ValueError("Point({},{})_{}_{} Field({}) does not lie on the elliptic curve y**2 = x**3 + {}x + {}"\
+                        .format(self.x.num,self.y.num,self.a.num,self.b.num,self.x.prime,self.a.num,self.b.num))
                 else:
-                    print("YES! The point {} lies on the curve".format(self))
+                    print("YES! The point({},{})_{}_{} Field({}) lies on the curve".format(self.x.num,self.y.num,self.a.num,self.b.num,self.x.prime))
             except ValueError:
-                print("NO! The point {} does not lie on the curve".format(self))
+                print("NO! The point({},{})_{}_{} Field({} does not lie on the curve"\
+                    .format(self.x.num,self.y.num,self.a.num,self.b.num,self.x.prime))
         
         else:
             if self.x == None or self.y == None:
                 return
             try:
                 if ((self.y ** 2) != (self.x ** 3) + (self.a * x) + self.b):
-                    raise ValueError("Point {} does not lie on the elliptic curve y**2 = x**3 + {}x + {}"\
-                        .format(self,self.a,self.b))
+                    raise ValueError("Point({},{})_{}_{} does not lie on the elliptic curve y**2 = x**3 + {}x + {}"\
+                        .format(self.x,self.y,self.a,self.b,self.a,self.b))
                 else:
-                    print("YES! The point {} lies on the curve elliptic curve y**2 = x**3 + {}x + {}"\
-                        .format(self,self.a,self.b))
+                    print("YES! The point({},{})_{}_{} does lies on the curve elliptic curve y**2 = x**3 + {}x + {}"\
+                        .format(self.x,self.y,self.a,self.b,self.a,self.b))
             except ValueError:
-                print("NO! The point {} does not lie on the curve elliptic curve y**2 = x**3 + {}x + {}"\
-                    .format(self,self.a,self.b))
+                print("NO! The point({},{})_{}_{} does not lie on the curve elliptic curve y**2 = x**3 + {}x + {}"\
+                    .format(self.x,self.y,self.a,self.b,self.a,self.b))
 
 #####################################################################################################
 
@@ -152,9 +152,9 @@ class Point:
         # Adding the additive identity (None,None) to x1,y1
         if self.field == True:
             if self.x.num == None and self.y.num == None:
-                return self.__class__(other.x, other.y, other.a, other.b)
+                return self.__class__(other.x, other.y,other.a,other.b)
             if other.x.num == None and other.y.num == None:
-                return self.__class__(self.x, self.y, self.a, self.b)
+                return self.__class__(self.x,self.y,self.a,self.b)
         else:
             if self.x == None and self.y == None:
                 return self.__class__(other.x, other.y,other.a,other.b)
@@ -175,10 +175,10 @@ class Point:
         #Add3 - x1 != x2 /  Refer to equation on page 36 of the book Programming Bitcoin, First Edition.
         if self.field == True:
             if self.x.num != other.x.num:
-                s = (other.y - self.y)/(other.x - self.x)
-                x_sum = s**2 - self.x - other.x
-                y_sum = s*(self.x - x_sum) - self.y
-                return self.__class__(x_sum, y_sum, self.a, self.b)
+                s = (other.y.num - self.y.num)/(other.x.num - self.x.num)
+                x_sum = s**2 - self.x.num - other.x.num
+                y_sum = s*(self.x.num - x_sum) - self.y.num
+                return self.__class__(x_sum, y_sum, self.a.num, self.b.num)
 
         else:
             if self.x != other.x:
