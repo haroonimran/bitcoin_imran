@@ -205,7 +205,7 @@ class Point:
             x = s**2 - 2 * self.x
             y = s * (self.x - x) - self.y
             return self.__class__(x, y, self.a, self.b)
-
+"""
     # tag::source3[]
     def __rmul__(self, coefficient):
         coef = coefficient
@@ -218,7 +218,7 @@ class Point:
             coef >>= 1  # <5>
         return result
     # end::source3[]
-
+"""
 
 class PointTest(TestCase):
 

@@ -192,14 +192,14 @@ class Point:
         # Refer to equations f on pages 36-36 of the book Programming Bitcoin, First Edition.
         if self.field == True:
             if self == other:
-                s = (3*(self.x.num**2) + self.a.num)/2*self.y.num
-                x_sum = s**2 - self.x.num - other.x.num
-                y_sum = s*(self.x.num - x_sum) - self.y.num
-                return self.__class__(x_sum,y_sum,self.a.num, self.b.num)
+                s = (3*self.x**2 + self.a)/(2*self.y)
+                x_sum = s**2 - 2*self.x
+                y_sum = s*(self.x - x_sum) - self.y
+                return self.__class__(x_sum,y_sum,self.a, self.b)
         else:
             if self == other:
-                s = (3*(self.x**2) + self.a)/2*self.y
-                x_sum = s**2 - self.x - other.x1
+                s = (3*self.x**2 + self.a)/(2*self.y)
+                x_sum = s**2 - 2*self.x
                 y_sum = s*(self.x - x_sum) - self.y
                 return self.__class__(x_sum,y_sum,self.a, self.b)
         
