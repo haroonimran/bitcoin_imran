@@ -8,7 +8,7 @@ import bitcoin             #Using library funtions to generate private keys the 
 import base58              #to encode Private key to base58
 import binascii            #using binascii.unhexlify()
 from hashlib import sha256
-import ecdsa
+import ecch
 import os
 
 #STEP 1. #########  GENERATE PRIVATE KEY ############
@@ -79,10 +79,13 @@ _Gx = 0x79BE667EF9DCBBAC55A06295CE870B07029BFCDB2DCE28D959F2815B16F81798
 _Gy = 0x483ADA7726A3C4655DA4FBFC0E1108A8FD17B448A68554199C47D08FFB10D4B8
 
 # Define new secp256k1 curve:
-curve_secp256k1 = ecdsa.ellipticcurve.CurveFp(_p,_a,_b)
+p_Gx = ecch.FieldElement(_Gx,_p)
+p_Gy = ecch.FieldElement(_Gy,_p)
+p_a = ecch.FieldElement(_a,_p)
+p_b = ecch.FieldElement(_b,_p)
 
-# Set generator point:
-generator_secp256k1 = ecdsa.ellipticcurve.Point(curve_secp256k1,_Gx,_Gy,_r)
-print("generator_secp256k1",generator_secp256k1)
-point = generator_secp256k1 * private_key_bytes
-print(point)
+generator = ecch.Point(p_Gx,p_Gy,p_a,p_b)
+ecch.Point.onCurve(generator)
+pubkey = private_key_int * generator
+print("-------Publick Key Coordinates----------")
+print("Public Key = ",pubkey)
