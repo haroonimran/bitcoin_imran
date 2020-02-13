@@ -217,42 +217,9 @@ class Point:
                 return "Point({},{})_{}_{} FieldElement({})".format(self.x.num,self.y.num,self.a.num,self.b.num,self.x.prime)
             else:
                 return "Point({},{})_{}_{}".format(self.x,self.y,self.a,self.b)
-    
-    
-    """
+
     def __rmul__(self,coefficient):
         product = self
         for _ in range(coefficient-1):
             product = product + self
         return product
-    
-
-    def __rmul__(self, coefficient):
-        coef = coefficient
-        current = self  # <1>
-        result = self.__class__(None, None, self.a, self.b)  # <2>
-        while coef:
-            if coef & 1:  # <3>
-                result += current
-            current += current  # <4>
-            coef >>= 1  # <5>
-        return result
-    # end::source3[]
-    """
-    
-    # Multiplication using the russian peasant method.
-    # https://www.geeksforgeeks.org/russian-peasant-multiply-two-numbers-using-bitwise-operators/
-    # 
-    def __rmul__(self,num2):
-        num1_temp = num2
-        num2_temp = self
-        result = self.__class__(None, None, self.a, self.b)
-    
-        while num1_temp:
-            if num1_temp & 1:
-                result = result + num2_temp
-            num1_temp = num1_temp >> 1
-            num2_temp = num2_temp + num2_temp
-            
-        return result
-
