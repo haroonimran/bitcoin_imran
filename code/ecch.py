@@ -243,16 +243,15 @@ class Point:
     # Multiplication using the russian peasant method.
     # https://www.geeksforgeeks.org/russian-peasant-multiply-two-numbers-using-bitwise-operators/
     # 
-    def __rmul__(self,num2):
-        num1_temp = num2
-        num2_temp = self
+    def __rmul__(self,num):
+        num1_temp = num
+        self_temp = self
         result = self.__class__(None, None, self.a, self.b)
     
         while num1_temp:
-            if num1_temp & 1:
-                result = result + num2_temp
-            num1_temp = num1_temp >> 1
-            num2_temp = num2_temp + num2_temp
-            
+            if num1_temp & 1: #check if the coefficient divided by 2 is odd.
+                result = result + self_temp  # Add the point (where the corff. is odd)
+            num1_temp = num1_temp >> 1 # Divide the coeff by 2. 
+            self_temp = self_temp + self_temp  # Multuply the point by 2
         return result
 

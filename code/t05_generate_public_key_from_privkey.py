@@ -8,6 +8,7 @@ import bitcoin             #Using library funtions to generate private keys the 
 import base58              #to encode Private key to base58
 import binascii            #using binascii.unhexlify()
 from hashlib import sha256
+import hashlib
 import ecch
 import os
 
@@ -42,6 +43,7 @@ print("private key uncompressed:",private_uncompressed)
 private_key_w_checksum_cmp = private_key_temp+'01'+first4
 private_key_cmp_int = int(private_key_w_checksum_cmp,16)
 private_compressed = base58.b58encode_int(private_key_cmp_int)
+private_compressed = 0x18e14a7b6a307f426a94f8114701e7c8e774e7f9a47e2c2035db29a206321725
 print("private key compressed:",private_compressed)
 
 
@@ -89,3 +91,48 @@ ecch.Point.onCurve(generator)
 pubkey = private_key_int * generator
 print("-------Publick Key Coordinates----------")
 print("Public Key = ",pubkey)
+
+# https://en.bitcoin.it/wiki/Technical_background_of_version_1_Bitcoin_addresses#How_to_create_Bitcoin_Address
+
+# 1 - Take the corresponding public key generated with it (33 bytes, 1 byte 0x02 (y-coord is even), and 32 bytes corresponding to X coordinate) 
+public_key_x = pubkey.x.num
+public_key_y = pubkey.y.num
+if public_key_y % 2 == 0:
+    prefix = '02'
+else:
+    prefix= '03'
+
+temp_pub_key = prefix + (hex(public_key_x)[2:])
+
+print("temp_pub_key =",temp_pub_key)
+print(len(temp_pub_key))
+
+# 2 - Perform SHA-256 hashing on the public key 
+temp_pub_key_SHA = sha256(binascii.unhexlify(temp_pub_key)).hexdigest()
+
+# 3 - 3 - Perform RIPEMD-160 hashing on the result of SHA-256 
+h = hashlib.new('ripemd160')
+h.update(binascii.unhexlify(temp_pub_key_SHA))
+temp_pub_key_SHA_160 = h.hexdigest()
+
+#4 - Add version byte in front of RIPEMD-160 hash (0x00 for Main Network)
+temp_pub_key_SHA_160_plus_version = '00'+temp_pub_key_SHA_160
+
+#5 - Perform SHA-256 hash on the extended RIPEMD-160 result 
+temp_pub_key_SHA1 = sha256(binascii.unhexlify(temp_pub_key_SHA_160_plus_version)).hexdigest()
+#6 - Perform SHA-256 hash on the result of the previous SHA-256 hash 
+temp_pub_key_SHA2 = sha256(binascii.unhexlify(temp_pub_key_SHA1)).hexdigest()
+
+#7 - Take the first 4 bytes of the second SHA-256 hash. This is the address checksum
+checksum_pub = temp_pub_key_SHA2[0:8]
+print(checksum_pub)
+
+#8 - Add the 4 checksum bytes from stage 7 at the end of extended RIPEMD-160 hash from stage 4. This is the 25-byte binary Bitcoin Address.
+temp_pub_key_with_checksum = temp_pub_key_SHA_160 + checksum_pub
+print(temp_pub_key_with_checksum)
+
+#9 - Convert the result from a byte string into a base58 string using Base58Check encoding. This is the most commonly used Bitcoin Address format 
+public_address_int = int(temp_pub_key_with_checksum,16)
+print("pub address int =", public_address_int)
+public_address = base58.b58encode_int(public_address_int)
+print("Public Address =",public_address)
