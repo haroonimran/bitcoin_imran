@@ -17,6 +17,8 @@ import os
 #Generate a new 32bit random key using the OS's CSPRNG:
 private_key_bytes = os.urandom(32)
 private_key_hex = private_key_bytes.hex()
+private_key_hex = '8B7C0FCC173893EB11B15BC0015C6CABD485DAB72E2FE52E48F406406C2871FE'
+
 private_key_int = int(private_key_hex,16)
 print("Private key Bytes =", private_key_bytes)
 private_key_hex = private_key_bytes.hex()
@@ -42,10 +44,9 @@ print("private key uncompressed:",private_uncompressed)
 #uncompressed Private key
 private_key_w_checksum_cmp = private_key_temp+'01'+first4
 private_key_cmp_int = int(private_key_w_checksum_cmp,16)
+print("private_key_cmp_int=",private_key_cmp_int)
 private_compressed = base58.b58encode_int(private_key_cmp_int)
-private_compressed = 0x18e14a7b6a307f426a94f8114701e7c8e774e7f9a47e2c2035db29a206321725
 print("private key compressed:",private_compressed)
-
 
 
 # STEP 2: #######    GENERATE PUBLIC KEY    ########
@@ -102,37 +103,51 @@ if public_key_y % 2 == 0:
 else:
     prefix= '03'
 
-temp_pub_key = prefix + (hex(public_key_x)[2:])
+temp_pub_key = prefix + (hex(public_key_x)[2:]).rjust(64,'0')
 
 print("temp_pub_key =",temp_pub_key)
 print(len(temp_pub_key))
 
 # 2 - Perform SHA-256 hashing on the public key 
 temp_pub_key_SHA = sha256(binascii.unhexlify(temp_pub_key)).hexdigest()
+print("sha1 pub",temp_pub_key_SHA)
 
-# 3 - 3 - Perform RIPEMD-160 hashing on the result of SHA-256 
+# 3 - Perform RIPEMD-160 hashing on the result of SHA-256 
 h = hashlib.new('ripemd160')
 h.update(binascii.unhexlify(temp_pub_key_SHA))
 temp_pub_key_SHA_160 = h.hexdigest()
+print("RIP160 pub",temp_pub_key_SHA_160)
 
 #4 - Add version byte in front of RIPEMD-160 hash (0x00 for Main Network)
 temp_pub_key_SHA_160_plus_version = '00'+temp_pub_key_SHA_160
+print("temp_pub_key_SHA_160_plus_version=",temp_pub_key_SHA_160_plus_version)
 
 #5 - Perform SHA-256 hash on the extended RIPEMD-160 result 
 temp_pub_key_SHA1 = sha256(binascii.unhexlify(temp_pub_key_SHA_160_plus_version)).hexdigest()
+print("temp_pub_key_SHA1=",temp_pub_key_SHA1)
+
+
 #6 - Perform SHA-256 hash on the result of the previous SHA-256 hash 
 temp_pub_key_SHA2 = sha256(binascii.unhexlify(temp_pub_key_SHA1)).hexdigest()
+print("temp_pub_key_SHA2=",temp_pub_key_SHA2)
+
 
 #7 - Take the first 4 bytes of the second SHA-256 hash. This is the address checksum
 checksum_pub = temp_pub_key_SHA2[0:8]
 print(checksum_pub)
 
 #8 - Add the 4 checksum bytes from stage 7 at the end of extended RIPEMD-160 hash from stage 4. This is the 25-byte binary Bitcoin Address.
-temp_pub_key_with_checksum = temp_pub_key_SHA_160 + checksum_pub
-print(temp_pub_key_with_checksum)
+#temp_pub_key_with_checksum =  bytes(('0x'+temp_pub_key_SHA_160_plus_version + checksum_pub),'utf-8')
 
+temp_pub_key_with_checksum =  temp_pub_key_SHA_160_plus_version + checksum_pub
+print("temp_pub_key_with_checksum=",temp_pub_key_with_checksum)
+
+temp_pub_key_with_checksum_int = int(temp_pub_key_with_checksum,16)
 #9 - Convert the result from a byte string into a base58 string using Base58Check encoding. This is the most commonly used Bitcoin Address format 
-public_address_int = int(temp_pub_key_with_checksum,16)
-print("pub address int =", public_address_int)
-public_address = base58.b58encode_int(public_address_int)
-print("Public Address =",public_address)
+
+
+pub_address = '1'+  str(base58.b58encode_int(temp_pub_key_with_checksum_int),'utf-8')
+print("pub_address=",pub_address)
+
+#test here:
+# https://walletgenerator.net
