@@ -42,7 +42,7 @@ def PrivateKey():
     sha1 = sha256(binascii.unhexlify(private_key_uncomp)).hexdigest()
     sha2 = sha256(binascii.unhexlify(sha1)).hexdigest()
     first4 = sha2[0:8]
-    print("first 4 =",first4)
+    #print("first 4 =",first4)
 
     private_key_w_checksum_uncmp = private_key_uncomp+first4
     #print("private_key_temp_checksum =",private_key_w_checksum_uncmp)
@@ -59,13 +59,13 @@ def PrivateKey():
     sha1 = sha256(binascii.unhexlify(private_key_cmp)).hexdigest()
     sha2 = sha256(binascii.unhexlify(sha1)).hexdigest()
     first4_cmp = sha2[0:8]
-    print("first 4 cmp =",first4_cmp)
+    #print("first 4 cmp =",first4_cmp)
 
     private_key_w_checksum_cmp = private_key_cmp+first4_cmp
 
 
     private_key_cmp_int = int(private_key_w_checksum_cmp,16)
-    print("private_key_cmp=",private_key_w_checksum_cmp)
+    #print("private_key_cmp=",private_key_w_checksum_cmp)
     private_compressed = base58.b58encode_int(private_key_cmp_int)
     #print("private key compressed:",private_compressed)
 
