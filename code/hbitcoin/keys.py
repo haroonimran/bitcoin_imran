@@ -3,7 +3,6 @@
 # HAROON IMRAN
 # haroon.imran@gmail.com
 ##############################################################################################
-
 import base58              #to encode Private key to base58
 import binascii            #using binascii.unhexlify()
 from hashlib import sha256
@@ -22,7 +21,6 @@ class KeyTriplet:
 
 
 def PrivateKey():
-
     new_private_key = KeyTriplet()
 
 #STEP 1. #########  GENERATE PRIVATE KEY ############
@@ -183,4 +181,3 @@ def PublicKey(input_private_key):
     # https://walletgenerator.net/#
 
     return pub_address
-
