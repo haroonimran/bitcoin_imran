@@ -17,7 +17,7 @@ import os
 #Generate a new 32bit random key using the OS's CSPRNG:
 private_key_bytes = os.urandom(32)
 private_key_hex = private_key_bytes.hex()
-private_key_hex = '8B7C0FCC173893EB11B15BC0015C6CABD485DAB72E2FE52E48F406406C2871FE'
+#private_key_hex = '8B7C0FCC173893EB11B15BC0015C6CABD485DAB72E2FE52E48F406406C2871FE'
 
 private_key_int = int(private_key_hex,16)
 print("Private key Bytes =", private_key_bytes)
